@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <script>
+    //1.原型对象
+        function Person() {
+        }
+
+        Person.prototype.name = "lijiaqi";
+        Person.prototype.age = 24;
+        Person.prototype.sayName = function () {
+            return this.name;
+        };
+
+        var person1 = new Person();
+        console.log(person1.constructor === Person);  //true
+    //2.更简单的原型对象
+        //缺点constructor变为Object
+        function Dog() {
+        }
+        Dog.prototype = {
+            name : "xiaohua",
+            age : 4,
+            sayName :function () {
+                return this.name;
+            }
+        };
+
+        var dog1 = new Dog();
+        console.log(dog1.constructor === Dog);   //false
+        console.log(dog1.constructor === Object);  //true
+    //3.修正constructor简单的原型对象
+        //son属性值是引用类型，会造成一个实例改变，另外一个也跟着改变
+        function Dog1() {
+        }
+        Dog.prototype = {
+            name : "xiaohua",
+            age : 4,
+            son : ["haha","gaga","lala"],
+            sayName :function () {
+                return this.name;
+            }
+        };
+        Object.defineProperty(Dog.prototype , "constructor" , {
+            enumerable : false,
+            value : Dog
+        });
+        var dog2 = new Dog1();
+        console.log(dog2.constructor === Dog1);   //true
+
+    //4.组合使用构造函数与原型模式
+        function Cat() {
+            this.name = "xiaomao";
+            this.age = 6;
+            this.son = ["maoyi","maoer","maosan"];
+        }
+        Cat.prototype = {
+            sayName :function () {
+                return this.name;
+            }
+        };
+        var cat1 = new Cat();
+        var cat2 = new Cat();
+        cat1.son.push("maosi");
+        console.log(cat1.son === cat2.son); //false
+        console.log(cat2);
+
+    //5.寄生的构造函数模式(不能依赖instanceof来确认对象类型)
+        function Jisheng(name, age, job) {
+            var o = new Object();
+            o.name = name;
+            o.age = age;
+            o.job = job;
+            o.sayName = function(){
+                return this.name;
+            };
+            return o;
+        }
+        var jisheng = new Jisheng("jish",55,"teacher");
+        console.log(jisheng instanceof Jisheng);    //false
+        console.log(typeof jisheng);   //Object
+        console.log(jisheng.sayName());   //jish
+
+    //6.稳妥的构造函数模式（与寄生的构造函数模式相似，俩点不同：1.对象实例方法不引用this。2.不使用new操作符调用构造函数）
+        function Wentuo(name, age, job) {
+            var o = new Object();
+            o.name = name;
+            o.age = age;
+            o.job = job;
+            o.sayName = function(){
+                return name;
+            };
+            return o;
+        }
+        var wentuo = Wentuo("went",45,"doctor");
+        console.log(wentuo.sayName());    //went
+
+    </script>
+</body>
+</html>
